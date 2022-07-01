@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
-import Login from '@/pages/login/login'
+import { constantRouterMap } from './router.config.js'
+
 Vue.use(Router)
 
 // 重写router的push方法,解决跳转自身报错问题
@@ -12,16 +12,5 @@ Router.prototype.push = function push (location, onResolve, onReject) {
 }
 
 export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
-    },
-    {
-      path: '/login',
-      name: 'Login',
-      component: Login
-    }
-  ]
+  routes: constantRouterMap
 })

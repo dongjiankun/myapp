@@ -4,8 +4,8 @@ import { constantRouterMap } from './router.config.js'
 
 Vue.use(Router)
 
-// 重写router的push方法,解决跳转自身报错问题
-const originalPush = Router.prototype.push
+// 重写router的push方法,解决跳转自身报错问题,添加catch解决问题: catch(err => err)
+const originalPush = Router.prototype.push;
 Router.prototype.push = function push (location, onResolve, onReject) {
   if ( onResolve || onReject) return originalPush.call(this, location, onResolve, onReject)
   return originalPush.call(this, location).catch(err => err)

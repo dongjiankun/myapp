@@ -67,7 +67,7 @@ export default {
   },
 
   mounted() {
-    console.log("this.props", this.menuInfo);
+    // console.log("this.props", this.menuInfo);
   },
 
   created() {},

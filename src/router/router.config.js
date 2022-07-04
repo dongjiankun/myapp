@@ -21,21 +21,7 @@ export const asyncRouerMap = [];
 
 // 路由的name必须与组件页面的name一致,这样才能使用include去动态缓存路由
 export const constantRouterMap = [
-  // {
-  //   path: '/HelloWorld',
-  //   name: 'HelloWorld',
-  //   component: HelloWorld
-  // },
-  // {
-  //   path: '/login',
-  //   name: 'Login',
-  //   component: Login
-  // },
-  // {
-  //   path:'/homeChildOne',
-  //   name:'homeChildOne',
-  //   component:homeChildOne ,
-  // },
+ 
   {
     path: '/',
     name: 'index',
@@ -43,6 +29,7 @@ export const constantRouterMap = [
     meta: {
       hidden: true,
       title: '',
+      icon:'el-icon-s-grid'
     },
     children: [{
         path: '/home',

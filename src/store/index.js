@@ -41,6 +41,8 @@ export default new Vuex.Store({
             const index = state.tabConfig.findIndex(int => int.path === item.path)
             // 使用当前时间戳生成唯一key值
             item.id= `${item.path}-${new Date().getTime()}`;
+
+            state.activeKey = item.path
             
             if(index !== -1){
                 //新增已存在的书签 ,替换

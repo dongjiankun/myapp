@@ -2,21 +2,22 @@
   <div class="bg">
     <el-container class="bg-container">
       <el-scrollbar style="height: 100%">
-        <el-aside class="bg-aside" :width="isCollapse ? '95px' : '200px'">
+        <el-aside class="bg-aside" :width="isCollapse ? '60px' : '200px'">
           <div class="aside-wrapper">
             <el-button
-              @click="isCollapse = !isCollapse"
+              @click="changeCollapse"
               type="text"
               :icon="!isCollapse ? 'el-icon-s-fold' : 'el-icon-s-unfold'"
             />
             <el-menu
-              text-color="#909090"
+              text-color="#f4f4f4"
               :unique-opened="true"
               active-text-color="#001529"
               :collapse="isCollapse"
+              :default-active="activeKey"
             >
               <!-- 遍历路由生成菜单 -->
-              <template v-for="menu in menus">
+              <template v-for="(menu, index) in menus">
                 <!-- subMenu组件 -->
                 <sub-menu
                   v-if="menu.children && menu.children.length"
@@ -28,15 +29,23 @@
                 <el-menu-item
                   v-else-if="menu.meta.hidden !== true"
                   :key="menu.path"
-                  :index="menu.path"
+                  :index="index"
                   @click="menuClick(menu)"
                 >
-                  <i
+                  <!-- <i
                     v-if="menu.meta.icon"
                     :key="menu.meta.icon"
                     :class="menu.meta.icon"
                   ></i>
-                  <span>{{ menu.name }}</span>
+                  <span>{{ menu.name }}</span> -->
+                  <template slot="title">
+                    <i
+                      v-if="menu.meta.icon"
+                      :key="menu.meta.icon"
+                      :class="menu.meta.icon"
+                    ></i>
+                    <span>{{ menu.name }}</span>
+                  </template>
                 </el-menu-item>
               </template>
             </el-menu>
@@ -106,7 +115,7 @@ export default {
   name: "BasicLayout",
   data() {
     return {
-      isCollapse: true,
+      isCollapse: false,
       menus: [
         // //每个索引对应一个菜单
         // {
@@ -118,6 +127,7 @@ export default {
         //   ],
         // },
       ],
+      //   defaultOpeneds:['0','1'],
     };
   },
 
@@ -163,6 +173,11 @@ export default {
   },
 
   methods: {
+    changeCollapse() {
+      this.$nextTick(() => {
+        this.isCollapse = !this.isCollapse;
+      });
+    },
     //点击菜单
     menuClick(item) {
       this.$store.commit("ADD_TAB", item);
@@ -180,13 +195,44 @@ export default {
       this.$store.commit("CHANGE_TABKEY", name);
     },
     // 刷新书签
-    refreshPage(val){
-        this.$store.commit("REFRESH_TAB", val);
+    refreshPage(val) {
+      console.log('refreshPage begin id',val.id)
+      this.$store.commit("CHANGE_TABKEY", val.path);
+      this.$store.commit("REFRESH_TAB", val);
+      console.log('refreshPage end id',this.$store.state.tabConfig[0].id)
     },
   },
 };
 </script>
 <style lang='less' scoped>
+/deep/.el-menu-vertical-demo:not(.el-menu--collapse) {
+  width: 200px;
+  min-height: 400px;
+}
+/deep/.el-submenu__title > span {
+  //   display: flex;
+  //   align-items: center;
+  //   justify-content: center;
+
+  i {
+    margin-right: 0;
+    color: #f4f4f4;
+  }
+}
+/deep/.el-menu--collapse .el-submenu__title span > span {
+  height: 0;
+  width: 0;
+  overflow: hidden;
+  visibility: hidden;
+  //   display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/deep/.el-menu--collapse .el-submenu__icon-arrow {
+  display: none;
+}
 .bg {
   width: 100vw;
   height: 100vh;
@@ -213,8 +259,8 @@ export default {
     flex-direction: column;
     align-items: center;
     /deep/ .el-button {
-      align-self: flex-end;
-      margin-right: 14px;
+      //   align-self: flex-end;
+      //   margin-right: 14px;
     }
     /deep/ .el-button--text {
       font-size: 24px !important;
@@ -234,6 +280,28 @@ export default {
   .el-submenu__icon-arrow {
     top: 31px;
   }
+}
+/deep/.el-submenu__title:hover {
+  background-color: #2972be;
+}
+/deep/.el-menu-item.is-active {
+     background: linear-gradient(
+    45deg,
+    #f4f4f4 0%,
+    rgb(56, 100, 194),
+    rgb(111, 111, 226)
+  ) !important;
+}
+/deep/ .el-menu-item:focus {
+  background: linear-gradient(
+    45deg,
+    #f4f4f4,
+    rgb(56, 100, 194),
+    rgb(111, 111, 226)
+  ) !important;
+}
+/deep/.el-menu-item:hover {
+  background: #2972be !important;
 }
 
 @keyframes turnZ {

@@ -35,10 +35,12 @@ export default {
     // // pagehide 解决ios移动端不支持beforeunload,安卓端两个都可以用
     // // 在页面刷新时将vuex里的信息保存到sessionStorage里
     //  window.addEventListener('beforeunload', () => {
+    //    console.log('beforeunload>>>>>>>>>')
     //   sessionStorage.setItem('store', JSON.stringify(this.$store.state))
     // })
     // 页⾯显⽰（pageshow）和页⾯隐藏（pagehide）事件
     window.addEventListener("pagehide", () => {
+      console.log('pagehide>>>>>>>>>')
       sessionStorage.setItem("store", JSON.stringify(this.$store.state));
     });
     // https://blog.csdn.net/weixin_42349568/article/details/122827399

@@ -2,8 +2,9 @@
 import HelloWorld from '@/components/HelloWorld'
 import Login from '@/pages/login/login'
 import Home from '@/pages/home/home';
-import BasicLayout from 'fromCom/BasicLayout.vue'
-
+import BasicLayout from 'fromCom/BasicLayout.vue';
+import Communication from '@/pages/vuePart/communication/index.vue';
+import emitPart from '@/pages/vuePart/communication/emitPart/father.vue'
 
 /* 
 目前脚手架中所有的路由都通过 router.config.js来统一管理，在 vue-router 的配置中我们增加了一些参数，如 hideChildrenInMenu,meta.title,meta.icon,meta.permission，来辅助生成菜单。其中：
@@ -21,7 +22,7 @@ export const asyncRouerMap = [];
 
 // 路由的name必须与组件页面的name一致,这样才能使用include去动态缓存路由
 export const constantRouterMap = [
- 
+
   {
     path: '/',
     name: 'index',
@@ -29,22 +30,46 @@ export const constantRouterMap = [
     meta: {
       hidden: true,
       title: '',
-      icon:'el-icon-s-grid'
+      icon: 'el-icon-s-grid'
     },
     children: [{
-        path: '/home',
-        name: 'Home',
-        component: Home,
-      },
+      path: '/home',
+      name: 'Home',
+      component: Home,
+    },
+    {
+      path: '/home/homeChildOne',
+      name: 'homeChildOne',
+      //动态注入
+      component: () => import('@/pages/home/homeChildOne.vue'),
+    },
+    {
+      path: '/home/HelloWorld',
+      name: 'HelloWorld',
+      component: HelloWorld
+    }
+    ]
+  },
+  {
+    path: '/vuePart',
+    name: 'vuePart',
+    component: BasicLayout,
+    meta: {
+      title: 'vue相关',
+      icon: 'el-icon-cpu'
+    },
+    children: [
       {
-        path: '/home/homeChildOne',
-        name: 'homeChildOne',
-        component: () => import('@/pages/home/homeChildOne.vue'),
-      },
-      {
-        path: '/home/HelloWorld',
-        name: 'HelloWorld',
-        component: HelloWorld
+        path: '/vuePart/communication',
+        name: 'communication',
+        component: Communication,
+        children: [
+          {
+            path: '/vuePart/communication/emitPart',
+            name: 'emitPart',
+            component: emitPart,
+          }
+        ]
       }
     ]
   }

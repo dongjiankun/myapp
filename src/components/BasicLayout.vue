@@ -74,13 +74,17 @@
             :name="tab.path || $route.path"
           >
             <span slot="label">
-              <i @click.stop="refreshPage(tab)" class="el-icon-refresh"></i>
+              <i
+                v-show="activeKey == tab.path"
+                @click.stop="refreshPage(tab)"
+                class="el-icon-refresh"
+              ></i>
               {{ tab.name || $route.name }}
             </span>
           </el-tab-pane>
         </el-tabs>
         <!-- 页面主体 -->
-        <el-main>
+        <el-main v-if="tabConfig.length">
           <!-- 路由,遍历所有书签,但是通过v-if控制展示 -->
           <template v-for="tab in tabConfig">
             <div
@@ -88,14 +92,23 @@
               :key="tab.id"
               style="height: 100%"
             >
-              <keep-alive>
-                <router-view
-                  v-if="tab.path == $route.path"
-                  :key="tab.id"
-                ></router-view>
-              </keep-alive>
+              <transition :name="transitionRouter">
+                <keep-alive>
+                  <router-view
+                    v-if="tab.path == $route.path"
+                    :key="tab.id"
+                  ></router-view>
+                </keep-alive>
+              </transition>
             </div>
           </template>
+        </el-main>
+        <el-main v-else>
+          <h1>首页</h1>
+          <li>
+            <ul>vue的jsx写法</ul>
+            <ul>准备面试</ul>
+          </li>
         </el-main>
         <!-- 底部 -->
         <el-footer style="background: #c1d1d7">Footer</el-footer>
@@ -116,6 +129,8 @@ export default {
   data() {
     return {
       isCollapse: false,
+      // 路由切换动画classname
+      transitionRouter: "",
       menus: [
         // //每个索引对应一个菜单
         // {
@@ -149,6 +164,13 @@ export default {
   },
 
   watch: {
+    tabConfig: {
+      handler(newVal, oldVal) {
+        // console.log("watch tabConfig", newVal);
+      },
+      deep: true,
+      immediate: true,
+    },
     activeKey: {
       handler(newVal, oldVal) {
         const tab = this.tabConfig.find((item) => item.path === newVal);
@@ -163,12 +185,40 @@ export default {
       immediate: true,
       deep: true,
     },
+    // 监听路由变化,根据书签数组中是否存在,及to,from的位置添加不同的动画
+    $route(to, from) {
+      let tabHasTo = false,
+        tabHasFrom = false;
+      let toIndex = -1,
+        fromIndex = -1;
+      for (let index = 0; index < this.tabConfig.length; index++) {
+        if (this.tabConfig[index].path === to.path) {
+          tabHasTo = true;
+          toIndex = index;
+        }
+        if (this.tabConfig[index].path === from.path) {
+          tabHasFrom = true;
+          fromIndex = index;
+        }
+      }
+      //如果书签中有to及from,则使用左右切换动画
+      if (tabHasTo && tabHasFrom) {
+        if (fromIndex < toIndex) {
+          this.transitionRouter = "slide-left";
+        } else {
+          this.transitionRouter = "slide-right";
+        }
+        // 如果书签中没有to或者from,则都添加渐入渐出动画
+      } else {
+        this.transitionRouter = "fade-out";
+      }
+    },
   },
 
   mounted() {},
 
   created() {
-    console.log("constantRouterMap>>>", generator(constantRouterMap));
+    // console.log("constantRouterMap>>>", generator(constantRouterMap));
     this.menus = generator(constantRouterMap);
   },
 
@@ -180,10 +230,13 @@ export default {
     },
     //点击菜单
     menuClick(item) {
-      this.$store.commit("ADD_TAB", item);
       this.$router.push({
         path: item.path,
-      });
+      }).then(()=>{
+         this.$store.commit("ADD_TAB", item);
+      })
+     
+      
     },
     // 关闭书签
     removee(val) {
@@ -191,15 +244,20 @@ export default {
     },
     // 切换书签
     changeActiveKey({ name }) {
-      console.log("changeActiveKey", name);
+      // console.log("changeActiveKey", name);
       this.$store.commit("CHANGE_TABKEY", name);
     },
     // 刷新书签
     refreshPage(val) {
-      console.log('refreshPage begin id',val.id)
-      this.$store.commit("CHANGE_TABKEY", val.path);
+      // console.log("refreshPage begin id", val.id);
+      //   this.$store.commit("CHANGE_TABKEY", val.path);
       this.$store.commit("REFRESH_TAB", val);
-      console.log('refreshPage end id',this.$store.state.tabConfig[0].id)
+      this.tabConfig[0].id = `${new Date().getTime()}`;
+      // 是不是因为tabConfig与router的key值只是单向绑定的问题?
+      //   this.$set("tabConfig", 0, "id", `${new Date().getTime()}`);
+      //在不断切换菜单后,再去点击书签的刷新,页面不会刷新,key打印是变了,只有在切换其他书签再切换回来才会触发刷新.watch也是同理.只有使用$forceUpdate才有用
+        this.$forceUpdate()
+      // console.log("refreshPage end id", this.$store.state.tabConfig[0].id);
     },
   },
 };
@@ -228,6 +286,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+   color: #f4f4f4 !important;
 }
 
 /deep/.el-menu--collapse .el-submenu__icon-arrow {
@@ -278,6 +337,7 @@ export default {
     padding: 0 !important;
   }
   .el-submenu__icon-arrow {
+    color: #f4f4f4;
     top: 31px;
   }
 }
@@ -285,7 +345,7 @@ export default {
   background-color: #2972be;
 }
 /deep/.el-menu-item.is-active {
-     background: linear-gradient(
+  background: linear-gradient(
     45deg,
     #f4f4f4 0%,
     rgb(56, 100, 194),
@@ -325,4 +385,67 @@ export default {
     animation-iteration-count: 1;
   }
 }
+// 路由跳转动画
+// .transitionRouter-enter-active,
+// .transitionRouter-leave-active {
+//     transition: all 0.4s;
+// }
+
+// .transitionRouter-enter,
+// .transitionRouter-leave{
+//     transform: translate3d(100%, 0, 0);
+// }
+
+// 路由动画
+
+.slide-right-enter-active,
+.slide-right-leave-active,
+.slide-left-enter-active,
+.slide-left-leave-active {
+  will-change: transform;
+  transition: all 300ms;
+  position: absolute;
+  z-index: -100;
+}
+
+.slide-right-enter {
+  opacity: 0;
+  transform: translate3d(-100%, 0, 0);
+}
+
+.slide-right-leave-active {
+  opacity: 0;
+  transform: translate3d(100%, 0, 0);
+}
+
+.slide-left-enter {
+  opacity: 0;
+  transform: translate3d(100%, 0, 0);
+}
+
+.slide-left-leave-active {
+  opacity: 0;
+  transform: translate3d(-100%, 0, 0);
+}
+
+
+.fade-out-enter-active{
+  will-change: opacity;
+  animation-name: fadeIn;
+  animation-duration: 1s;
+  animation-iteration-count: 1;
+  animation-delay: 0s;
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 </style>

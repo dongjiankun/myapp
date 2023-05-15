@@ -1,14 +1,17 @@
 <template>
   <div class="bg">
+    <header><div>111</div></header>
     <h1>HelloWorld</h1>
     <div class="hello">
       <div class="content">
         <div class="button" @click="changeMsg">
         </div>
          <el-input v-model="msg"></el-input>
-        
         <!-- <span v-for="item in msg" :key="item">{{ item }}</span> -->
         <span>{{msg}}</span>
+      </div>
+      <div>
+        <img src="../assets/images/IMG_6025.jpg" alt="无图片">
       </div>
     </div>
   </div>
@@ -26,6 +29,9 @@ export default {
     changeMsg() {
       this.msg='changed'
     },
+    addTwoNumber(){
+      
+    }
   },
 };
 </script>

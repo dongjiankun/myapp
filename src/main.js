@@ -6,7 +6,9 @@ import router from './router'
 import ElementUI from 'element-ui';
 import '@/assets/css/reset.css';
 import 'element-ui/lib/theme-chalk/index.css';
-import store from '@/store/index.js'
+import store from '@/store/index.js';
+import '@babel/polyfill';
+
 Vue.use(ElementUI);
 
 
